@@ -1,16 +1,21 @@
 // require("dotenv").config();
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
-
+import { app } from "./app.js";
 dotenv.config({
   path: "./env",
 });
-
-import dns from "node:dns";
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-
-connectDB();
+connectDB()
+  .then(() => {
+    app.listen(() => {
+      app.listen(process.env.PORT || 5173, () => {
+        console.log(`App is listening on port ${process.env.PORT}`);
+      });
+    });
+  })
+  .catch((err) => {
+    console.log("MongoDB connection failed !!!");
+  });
 
 // import express from "express";
 // const app = express();
