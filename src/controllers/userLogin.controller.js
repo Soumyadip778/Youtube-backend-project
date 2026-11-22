@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResonse } from "../utils/ApiResponse.js";
-import bcrypt from "bcrypt";
+import { generateAccessAndRefreshToken } from "../utils/AccessandRefresh.js";
 
 const loginUser = asyncHandler(async (req, res) => {
   //Input email & userName.toLowerCase()
@@ -34,7 +34,36 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Password does not match");
   }
 
-  res.status(201).json(new ApiResonse(201, "Successfully logged in"));
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    createdUser._id
+  );
+
+  // createdUser.refreshToken = refreshToken;
+
+  const loggedIn = await User.findById(createdUser._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(201)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResonse(
+        201,
+        {
+          user: loggedIn,
+          accessToken,
+          refreshToken,
+        },
+        "Successfully logged in"
+      )
+    );
 });
 
 export { loginUser };
