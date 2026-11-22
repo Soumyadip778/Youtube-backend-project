@@ -6,3 +6,5 @@ class ApiResonse {
     this.success = status < 400;
   }
 }
+
+export { ApiResonse };
