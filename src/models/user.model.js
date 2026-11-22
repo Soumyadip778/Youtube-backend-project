@@ -30,7 +30,7 @@ const userSchema = new Schema(
       required: true,
     },
 
-    avatar: {
+    coverImage: {
       type: String,
     },
     watchHistory: [
@@ -86,7 +86,7 @@ userSchema.methods.generateRefreshToken = function () {
     }
   );
 };
-// userSchema.methods.isPasswordCorrect = async function (password) {
-//   return await bcrypt.compare(password, this.password);
-// };
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 export const User = mongoose.model("User", userSchema);

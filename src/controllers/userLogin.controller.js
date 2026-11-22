@@ -16,9 +16,9 @@ const loginUser = asyncHandler(async (req, res) => {
   if ([email, userName].some((fields) => fields?.trim() === "")) {
     throw new ApiError(400, "Username and Email cannot be empty");
   }
-
+  const username = userName.toLowerCase();
   const createdUser = await User.findOne({
-    $and: [{ email }, { userName }],
+    $or: [{ email }, { username }],
   });
 
   if (!createdUser) {
@@ -28,12 +28,9 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!password) {
     throw new ApiError(400, "Password cannot be empty");
   }
-  const isPasswordCorrect = await bcrypt.compare(
-    password,
-    createdUser.password
-  );
+  const isPasswordValid = await createdUser.isPasswordCorrect(password);
 
-  if (!isPasswordCorrect) {
+  if (!isPasswordValid) {
     throw new ApiError(400, "Password does not match");
   }
 
