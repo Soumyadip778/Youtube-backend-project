@@ -1,16 +1,16 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { User } from "../models/user.model";
-import { ApiResonse } from "../utils/ApiResponse";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { User } from "../models/user.model.js";
+import { ApiResonse } from "../utils/ApiResponse.js";
 export const logoutUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1,
       },
     },
     {
-      new: true,
+      returnDocument: "after",
     }
   );
 

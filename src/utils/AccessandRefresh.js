@@ -1,19 +1,25 @@
-import { ApiError } from "./ApiError";
-import { User } from "../models/user.model";
+import { ApiError } from "./ApiError.js";
+import { User } from "../models/user.model.js";
 
 const generateAccessAndRefreshToken = async (id) => {
   try {
     const user = await User.findById(id);
 
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+
+    const accessToken = await user.generateAccessToken();
+    const refreshToken = await user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
   } catch (error) {
-    throw new ApiError(500, "Unable to generate Access and Generate token");
+    console.error("Token generation error:", error);
+
+    throw new ApiError(500, "Unable to generate access and refresh tokens");
   }
 };
 

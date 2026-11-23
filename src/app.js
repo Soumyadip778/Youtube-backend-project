@@ -23,5 +23,7 @@ import router from "./routes/user.route.js";
 
 //routes declaration
 app.use("/api/v1/users", router);
-app.use("/api/v2/login", router);
+app.use("/api/v1/users", router);
+app.use("/api/v1/users", router);
+
 export { app };
